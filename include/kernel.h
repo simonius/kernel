@@ -6,6 +6,8 @@
 extern void _reboot(void);
 void init(void);
 
-void kprint(char*);
+void kprint(char *);
+void pprint(void *);
+void iprint(int);
 
 #endif
