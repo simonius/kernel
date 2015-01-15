@@ -15,8 +15,8 @@
 .global _start
 .global _reboot
 _start:
-	mov $kernel_stack, %esp
-//	movb $'A', (0xb8000)  
+	cli
+	mov $kernel_stack, %esp 
 	call init
 
 _stop:

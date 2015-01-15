@@ -1,4 +1,4 @@
-OBJ = kernel.o  start.o vga.o kprint.o klib.o i386.o
+OBJ = kernel.o  start.o vga.o kprint.o klib.o i386.o isr.o
 HDR = include/kernel.h include/vga.h include/klib.h include/i386.h
 
 
