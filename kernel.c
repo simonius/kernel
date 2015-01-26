@@ -1,5 +1,6 @@
 #include "include/kernel.h"
 #include "include/i386.h"
+#include "include/proc.h"
 
 void init(void)
 {
@@ -12,9 +13,9 @@ void init(void)
 	kprint("idt_init ... ");
 	idt_init();
 	kprint("done \n");
-
-	asm volatile ("int $0x1");
-	asm volatile ("int $0x2");
-	asm volatile ("int $0x20");
+	process_init();	
+	asm volatile("sti");
+	while(1);
 }
+
 

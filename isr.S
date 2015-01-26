@@ -50,15 +50,24 @@ ISR(1864)
 master_isr:
 
 	pusha
+	
+	mov $0x10, %eax //load kernel data segments
+	mov %eax, %ds
+	mov %eax, %es
+
 
 	push %esp // put struct ptr on stack 
 	call handle_interupt
-	add $4, %esp
+	mov %eax, %esp //copy ptr to i386_state in SP;
+		
+	mov $0x23, %eax
+	mov %eax, %ds
+	mov %eax, %es	
 
 	popa
 
 	add $8, %esp
-
+	
 	iret
 
 

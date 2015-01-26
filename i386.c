@@ -1,9 +1,24 @@
 #include "include/i386.h"
 #include "include/kernel.h"
+#include "include/proc.h"
 
 long long gdt_table[GDT_LIMIT];
 long long idt_table[IDT_LIMIT];
+unsigned int tss[32];
+
 struct table gdt, idt ;
+
+void state_print(struct i386_state *ptr)
+{
+	kprint("CPU state at: "); pprint(ptr);
+	kprint("USER ESP:"); pprint(ptr->esp);
+	kprint("USER SS:"); pprint(ptr->esp);
+	kprint("USER CS:"); pprint(ptr->cs);
+	kprint("USER EIP:"); pprint(ptr->eip);
+	kprint("USER INT:"); iprint(ptr->INT);
+	kprint("\n");
+}
+
 
 void load_seg_kernel(int ds, char ring)
 {
@@ -15,9 +30,8 @@ void load_seg_kernel(int ds, char ring)
 			"mov %%ax, %%gs \n\t"
 			"mov %%ax, %%ss \n\t"
 			:: "a"(ds));
-	asm volatile( 	"ljmp $0x08, $1f  \n\t" /*numeric laberl forwar, f suffix*/
+	asm volatile( 	"ljmp $0x08, $1f  \n\t" /*numeric label forward, f suffix*/
 			"1: \n\t");
-
 	return;
 	
 
@@ -35,7 +49,7 @@ void load_gdt(struct table gdt)
 long long gdt_entry(long base, long limit, char acces, char flags)
 {
 	long long gdt_entry = limit & 0xffff;
-	gdt_entry |= (base & 0xffffff) << 16;
+	gdt_entry |= ((long long)base & 0xffffff) << 16;
 	gdt_entry |= ((long long)acces & 0xff) << 40;
 	gdt_entry |= ((long long)limit & 0x0f0000) << 32;
 	gdt_entry |= ((long long)flags & 0xf0) << 48;
@@ -50,10 +64,18 @@ void gdt_init()
 	gdt_table[DS_KERNEL] = gdt_entry(0, GDT_4GB, GDT_SEG_DATA | ACS_RING0, GDT_GRAN_PM | GDT_GRAN_PAGE);
 	gdt_table[CS_USER] = gdt_entry(0, GDT_4GB, GDT_SEG_CODE | ACS_RING3, GDT_GRAN_PM | GDT_GRAN_PAGE);
 	gdt_table[DS_USER] = gdt_entry(0, GDT_4GB, GDT_SEG_DATA | ACS_RING3, GDT_GRAN_PM | GDT_GRAN_PAGE);
+	gdt_table[TSS]	= gdt_entry((int)tss, sizeof(tss), GDT_TSS, GDT_GRAN_PM);
+
 	gdt.limit = GDT_LIMIT ;
 	gdt.entries = (void *)gdt_table;
+
+	tss[0] = 0;
+	tss[1] = 0;
+	tss[2] = 0x10;
+
 	load_gdt(gdt);
 	load_seg_kernel(DS_KERNEL, 0);
+	asm volatile("ltr %%ax" :: "a"(TSS << 3  )); 
 }
 
 long long idt_entry(long offset, int cs, int flags)
@@ -68,13 +90,28 @@ long long idt_entry(long offset, int cs, int flags)
 	return idt_entry;
 }
 
-void handle_interupt(struct i386_state *cpu)
+struct i386_state *handle_interupt(struct i386_state *cpu)
 {
-	kprint("INT: ");
-	iprint(cpu->INT);
-	kprint("\nEIP: ");
-	pprint((void*) cpu->eip);
-	kprint("\n");
+	curr_task->cpu = cpu;
+	
+	switch(cpu->INT){
+	case 0x0d:
+		kprint("\n   GPF INT 13 !   ");
+		asm volatile ("cli; hlt");
+		while(1);
+	case 0x20:
+		schedule();
+		tss[1] = (unsigned int)(curr_task->cpu + 1);
+	break;
+	default:
+		state_print(curr_task->cpu);
+	}
+	
+
+	outb(0xa0, 0x20); // demask PIC
+	outb(0x20, 0x20);
+	return curr_task->cpu;
+		
 }
 
 void load_idt(struct table idt)
@@ -108,7 +145,7 @@ void idt_init()
 	outb(0xa0, 0x0);
 	// end www.lowlevel.eu
 
-	idt_table[0] = 0;
+
 	ISR(0);
 	ISR(1);
 	ISR(2);
@@ -130,7 +167,7 @@ void idt_init()
         ISR(18);
 
 	for (i = 19; i < 32; i++)
-		idt_table[i + 1] = idt_entry((long)isr1864, CS_KERNEL, ISR_HW);
+		idt_table[i] = idt_entry((long)isr1864, CS_KERNEL, ISR_HW);
  	
         ISR(32);
         ISR(33);

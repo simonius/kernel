@@ -12,12 +12,14 @@
 #define ACS_CODE		0b00001000
 #define ACS_DATA		0b0
 #define ACS_WRITE		0b00000010
+#define ACS_TSS			0b00001001
 
 #define GDT_GRAN_PAGE		0b10000000
 #define GDT_GRAN_PM		0b01000000
 
 #define GDT_SEG_CODE	ACS_PRSNT | ACS_MSEG | ACS_CODE | ACS_WRITE
 #define GDT_SEG_DATA	ACS_PRSNT | ACS_MSEG | ACS_DATA | ACS_WRITE	
+#define GDT_TSS		ACS_PRSNT | ACS_RING3 | ACS_TSS // RING0 ?
 
 #define GDT_LIMIT 6
 #define GDT_4GB 0xffffffff
@@ -25,6 +27,7 @@
 #define DS_KERNEL	2
 #define CS_USER		3
 #define DS_USER		4
+#define TSS		5
 
 #define ISR_TYP_HW	0x600
 #define ISR_TYP_Trap	0x700
@@ -38,7 +41,7 @@
 #define ISR_HW 		ISR_TYP_HW | ISR_32 | ISR_USER | ISR_P
 
 #define IDT_LIMIT	50 
-#define ISR(nr)         idt_table[nr + 1] = idt_entry( (long) isr##nr , CS_KERNEL, ISR_HW)
+#define ISR(nr)         idt_table[nr]  = idt_entry( (long) isr##nr , CS_KERNEL, ISR_HW)
 #define ISR_H(nr)	void isr##nr (void);
 
 
@@ -77,7 +80,7 @@ void load_seg_kernel(int ds, char ring);
 long long idt_entry(long offset, int cs, int flags);
 void load_idt(struct table);
 void idt_init();
-void handle_interupt(struct i386_state *);
+struct i386_state *handle_interupt(struct i386_state *);
 void outb(short port, char wert);
 
 ISR_H(0)

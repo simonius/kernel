@@ -1,9 +1,12 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
+#define NULL	(void*)0
 
 
-extern void _reboot(void);
+
+
+void _reboot(void);
 void init(void);
 
 void kprint(char *);
