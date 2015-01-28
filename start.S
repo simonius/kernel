@@ -1,5 +1,5 @@
 #define MB_MAGIC 0x1badb002
-#define MB_FLAGS 0x0
+#define MB_FLAGS 0x2 //get mem info
 #define MB_CHECKSUM - (MB_MAGIC + MB_FLAGS)
 
 .extern init
@@ -16,7 +16,8 @@
 .global _reboot
 _start:
 	cli
-	mov $kernel_stack, %esp 
+	mov $kernel_stack, %esp
+	push %ebx //ptr to multiboot structure
 	call init
 
 _stop:

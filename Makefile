@@ -1,5 +1,5 @@
-OBJ = kernel.o  start.o vga.o kprint.o klib.o i386.o isr.o proc.o
-HDR = include/kernel.h include/vga.h include/klib.h include/i386.h include/proc.h
+OBJ = kernel.o  start.o vga.o kprint.o klib.o i386.o isr.o proc.o mm.o
+HDR = include/kernel.h include/vga.h include/klib.h include/i386.h include/proc.h include/mm.h include/multiboot.h
 
 
 CC = clang
@@ -20,6 +20,6 @@ kernel: $(OBJ) $(HDR)
 	$(CC) $(ASFLAGS) -o $@ $^
 
 clean:
-	rm *.o
+	rm *.o kernel
 
 .PHONY: clean 

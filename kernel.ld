@@ -4,6 +4,8 @@ SECTIONS
 {
 	. = 0x100000;
 	
+	_kernel_begin = ABSOLUTE(.);
+
 	.text : {
 		*(.multiboot)
 		*(.text)
@@ -17,4 +19,7 @@ SECTIONS
 	.bss ALIGN(4096) : {
 		*(.bss)
 	}
+	. = ALIGN(4096);
+	_kernel_end = ABSOLUTE(.);
+	
 }

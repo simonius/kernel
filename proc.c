@@ -3,7 +3,7 @@
 #include "include/proc.h"
 #include "include/klib.h"
 #include "include/kernel.h"
-
+#include "include/mm.h"
 
 struct process *curr_task = NULL;
 struct process *runnable = NULL;
@@ -33,6 +33,10 @@ struct process* create_process(unsigned int entry)
 	
 	kprint("Creating Process: ");iprint(i); kprint("\n");
 	tasks[i].flags = PROCESS_VALID | PROCESS_RUN;
+
+	tasks[i].kernel_stack = ppage_alloc();
+	tasks[i].user_stack = ppage_alloc();	
+
 	tasks[i].cpu = &(tasks[i].kernel_stack[4095]) - sizeof(struct i386_state);
 
 	for (j = 0; j < sizeof(struct i386_state); j++)	

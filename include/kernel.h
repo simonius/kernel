@@ -5,9 +5,10 @@
 
 
 
+extern void _kernel_begin;
+extern void _kernel_end;
 
 void _reboot(void);
-void init(void);
 
 void kprint(char *);
 void pprint(void *);

@@ -8,8 +8,8 @@
 struct process {
 	int flags;
 	struct i386_state *cpu;
-	char kernel_stack[4096];
-	char user_stack[4096];
+	void *kernel_stack;
+	void *user_stack;
 	struct process *next_runnable;
 };
 
