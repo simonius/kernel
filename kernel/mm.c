@@ -1,6 +1,6 @@
-#include "include/mm.h"
-#include "include/kernel.h"
-#include "include/multiboot.h"
+#include <mm.h>
+#include <kernel.h>
+#include <multiboot.h>
 
 unsigned int pm_bitmap[(BITMAPEND / PAGESIZE)/32];
 

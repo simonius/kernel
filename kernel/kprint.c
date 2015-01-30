@@ -1,5 +1,5 @@
-#include "include/kernel.h"
-#include "include/vga.h"
+#include "kernel.h"
+#include "vga.h"
 
 void puthex(char hex)
 {

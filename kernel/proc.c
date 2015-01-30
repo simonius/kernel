@@ -1,9 +1,9 @@
 /* proc.c - scheduling and other process managment*/
 
-#include "include/proc.h"
-#include "include/klib.h"
-#include "include/kernel.h"
-#include "include/mm.h"
+#include <proc.h>
+#include <klib.h>
+#include <kernel.h>
+#include <mm.h>
 
 struct process *curr_task = NULL;
 struct process *runnable = NULL;

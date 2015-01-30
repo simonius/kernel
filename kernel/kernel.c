@@ -1,8 +1,8 @@
-#include "include/kernel.h"
-#include "include/i386.h"
-#include "include/proc.h"
-#include "include/mm.h"
-#include "include/multiboot.h"
+#include <kernel.h>
+#include <i386.h>
+#include <proc.h>
+#include <mm.h>
+#include <multiboot.h>
 
 void init(struct multiboot *mbs)
 {

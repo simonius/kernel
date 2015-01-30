@@ -1,6 +1,6 @@
-#include "include/i386.h"
-#include "include/kernel.h"
-#include "include/proc.h"
+#include <i386.h>
+#include <kernel.h>
+#include <proc.h>
 
 long long gdt_table[GDT_LIMIT];
 long long idt_table[IDT_LIMIT];
