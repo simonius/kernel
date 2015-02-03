@@ -6,9 +6,6 @@
 
 void init(struct multiboot *mbs)
 {
-	void *pmpage[8];
-	int i;
-
 	kprint("\f");
 	kprint("Hello Hardware \n");
 
@@ -25,8 +22,9 @@ void init(struct multiboot *mbs)
 	kprint("done \n");
 		
 
-	process_init();	
+	process_init(mbs);
 	asm volatile("sti");
+	curr_task->flags = PROCESS_VALID;
 	while(1);
 }
 

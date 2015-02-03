@@ -5,6 +5,9 @@
 #define TASK_LIMIT 16
 #define PROCESS_VALID 0x001
 #define PROCESS_RUN 0x002
+
+#include <multiboot.h>
+
 struct process {
 	int flags;
 	struct i386_state *cpu;
@@ -17,7 +20,7 @@ extern struct process *curr_task;
 extern struct process tasks[];
 
 void schedule();
-struct process* create_process(unsigned int entry);
-void process_init();
+int create_process(unsigned int entry);
+void process_init(struct multiboot *mbs);
 
 #endif

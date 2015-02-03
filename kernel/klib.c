@@ -14,3 +14,12 @@ void *memcpy(void *dest, void *src, unsigned long n)
 
 	return dest;
 }
+
+void panic(char *str)
+{
+	kprint(" \n\nCongratulations: A KERNEL PANIC \n\nWhy ? Because:");
+	kprint(str);
+	kprint("\n");
+
+	while(1);
+}

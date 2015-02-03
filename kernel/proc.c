@@ -4,10 +4,29 @@
 #include <klib.h>
 #include <kernel.h>
 #include <mm.h>
+#include <multiboot.h>
+#include <elf.h>
+#include <i386.h>
 
 struct process *curr_task = NULL;
 struct process *runnable = NULL;
 struct process tasks[TASK_LIMIT];
+
+
+
+
+void print_task(struct process *task)
+{
+	kprint("Task: \n Kernel Stack:"); pprint(task->kernel_stack);
+	kprint("User Stack:"); pprint(task->user_stack);
+	kprint("\nCPU State:"); state_print(task->cpu);
+	kprint("\nFlags:");
+	if (task->flags & PROCESS_RUN)
+		kprint("RUNNABLE");
+	if (task->flags & PROCESS_VALID)
+		kprint("VALID");
+	return;
+}
 
 void schedule()
 {
@@ -24,22 +43,22 @@ void schedule()
 }
 
 
-struct process* create_process(unsigned int entry)
+int create_process(unsigned int entry)
 {
 	int i, j;
 	for (i = 0; i < TASK_LIMIT; i++)
 		if (0 == (tasks[i].flags & PROCESS_VALID))
 			break;
-	
+
 	kprint("Creating Process: ");iprint(i); kprint("\n");
 	tasks[i].flags = PROCESS_VALID | PROCESS_RUN;
 
 	tasks[i].kernel_stack = ppage_alloc();
-	tasks[i].user_stack = ppage_alloc();	
+	tasks[i].user_stack = ppage_alloc();
 
 	tasks[i].cpu = &(tasks[i].kernel_stack[4095]) - sizeof(struct i386_state);
 
-	for (j = 0; j < sizeof(struct i386_state); j++)	
+	for (j = 0; j < sizeof(struct i386_state); j++)
 		*((char*)tasks[i].cpu + j) = 0;
 
 	tasks[i].cpu->esp = &(tasks[i].user_stack[4095]);
@@ -48,43 +67,28 @@ struct process* create_process(unsigned int entry)
 	tasks[i].cpu->ss = 0x20 | 0x03;
 	tasks[i].cpu->eip = entry;
 	tasks[i].next_runnable = NULL;
-	return &tasks[i];
-	
+	return i;
 }
 
-void task_a()
+void process_init(struct multiboot *mbs)
 {
-	int i;
-	while(1){
-		kprint("A");
-		for(i = 0 ; i < 10000000; i++); 
-
-
-	}
-}
-
-void task_b()
-{
-	int i, j;
-	for (j = 0; j < 10; j++){
-		kprint("B");
-		for(i = 0; i < 10000000; i++);
-	}
-
-	asm volatile("cli; hlt");
-
-}
-
-void process_init()
-{
-	int i;
+	int PID;
 	tasks[0].flags = PROCESS_VALID;
- 
-	for (i = 1; i < TASK_LIMIT; i++)
-		tasks[i].flags = 0;
-
-	runnable = create_process((unsigned int)task_a);
-	runnable->next_runnable = create_process((unsigned int)task_b);
-	runnable->next_runnable->next_runnable = runnable;
 	curr_task = &tasks[0];
+
+	for (PID = 1; PID < TASK_LIMIT; PID++)
+		tasks[PID].flags = 0;
+
+	if (mbs->mbs_mods_count < 1)
+		panic("No Init Module");
+
+	iprint(mbs->mbs_mods_count);
+	kprint(" Multiboot Modules, using one as init: ");
+	kprint(mbs->mbs_mods_addr->mod_name);
+	kprint("\n");
+
+	if (load_elf_module(mbs->mbs_mods_addr->mod_start, &PID))
+		panic("Bad init Module");
+
+	runnable = &tasks[PID];
 }

@@ -1,6 +1,7 @@
 #include <i386.h>
 #include <kernel.h>
 #include <proc.h>
+#include <syscall.h>
 
 long long gdt_table[GDT_LIMIT];
 long long idt_table[IDT_LIMIT];
@@ -93,8 +94,12 @@ long long idt_entry(long offset, int cs, int flags)
 struct i386_state *handle_interupt(struct i386_state *cpu)
 {
 	curr_task->cpu = cpu;
-	
+
 	switch(cpu->INT){
+	case 0x06:
+		state_print(curr_task->cpu);
+		panic("Invalid OP");
+	break;
 	case 0x0d:
 		kprint("\n   GPF INT 13 !   ");
 		asm volatile ("cli; hlt");
@@ -103,6 +108,10 @@ struct i386_state *handle_interupt(struct i386_state *cpu)
 		schedule();
 		tss[1] = (unsigned int)(curr_task->cpu + 1);
 	break;
+	case 48:
+		kprint("SYSCALL !!!");
+		syscall(cpu);
+		break;
 	default:
 		state_print(curr_task->cpu);
 	}

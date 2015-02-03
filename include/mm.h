@@ -11,6 +11,7 @@
 #define BITMAP_I(PTR) (unsigned int)PTR/(PAGESIZE*32)
 #define BITMAP_J(PTR) ((unsigned int)PTR/PAGESIZE)%32
 
+int ppage_reserve(void *page);
 void* ppage_alloc();
 int ppage_free(void *page);
 void pmm_init();

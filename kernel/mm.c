@@ -21,7 +21,8 @@ void pmm_init(struct multiboot *mbs)
 	int i;
 	void *page;
 	struct mb_mmap *mmap, *mmap_end;
-	
+	struct mb_mod *mod, *mods_end;
+
 	kprint(" allocating bitmap for "); iprint(BITMAPEND);
 	kprint(" Bytes of size "); iprint(sizeof(pm_bitmap));
 	kprint(" Bytes\n");
@@ -29,7 +30,9 @@ void pmm_init(struct multiboot *mbs)
 	for (i = 0; i < (sizeof(pm_bitmap) / 4); pm_bitmap[i] = ~0, i++);
 
 	mmap = mbs->mbs_mmap;
+	mod = mbs->mbs_mods_addr;
 	mmap_end = (void *)mmap + mbs->mbs_mmap_length;
+
 	while(mmap < mmap_end) {
 		kprint("BEGIN: ");pprint(mmap->baseaddr);
 		kprint("END: ");pprint(mmap->length + mmap->baseaddr);
@@ -43,6 +46,12 @@ void pmm_init(struct multiboot *mbs)
 			kprint(" USED \n");
 		}	
 		mmap = (void*)mmap + mmap->size + 4;
+	}
+
+	for (i = 0; i < mbs->mbs_mods_count; i++) {
+		ppage_reserve(mod + i);
+		for (page = mod->mod_start; page < mod->mod_end; page++)
+			ppage_reserve(page);
 	}
 
 	ppage_reserve(mbs);
