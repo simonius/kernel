@@ -2,6 +2,7 @@
 #include <kernel.h>
 #include <proc.h>
 #include <syscall.h>
+#include <klib.h>
 
 long long gdt_table[GDT_LIMIT];
 long long idt_table[IDT_LIMIT];
@@ -12,11 +13,11 @@ struct table gdt, idt ;
 void state_print(struct i386_state *ptr)
 {
 	kprint("CPU state at: "); pprint(ptr);
-	kprint("USER ESP:"); pprint(ptr->esp);
-	kprint("USER SS:"); pprint(ptr->esp);
-	kprint("USER CS:"); pprint(ptr->cs);
-	kprint("USER EIP:"); pprint(ptr->eip);
-	kprint("USER INT:"); iprint(ptr->INT);
+	kprint("\nUSER ESP:"); pprint(ptr->esp);
+	kprint("\nUSER SS:"); hexprint(ptr->ss);
+	kprint("\nUSER CS:"); hexprint(ptr->cs);
+	kprint("\nUSER EIP:"); pprint(ptr->eip);
+	kprint("\nUSER INT:"); iprint(ptr->INT);
 	kprint("\n");
 }
 

@@ -1,6 +1,7 @@
 #include <syscall.h>
 #include <i386.h>
 #include <vga.h>
+#include <kernel.h>
 
 void syscall(struct i386_state *cpu)
 {

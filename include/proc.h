@@ -20,7 +20,7 @@ extern struct process *curr_task;
 extern struct process tasks[];
 
 void schedule();
-int create_process(unsigned int entry);
+int create_process(void *entry);
 void process_init(struct multiboot *mbs);
 
 #endif

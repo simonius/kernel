@@ -19,7 +19,7 @@ struct elf_hdr{
 	unsigned short	typ;
 	unsigned short	machine;
 	unsigned int	version_2;
-	unsigned int	entry;
+	void		*entry;
 	unsigned int	phoff;
 	unsigned int	shoff;
 	unsigned int	flags;

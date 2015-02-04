@@ -11,17 +11,17 @@ int load_elf_module(void *module, int *PID) //FIXME : check on every magic/size/
 
 	if (hdr->magic != (ELF_MAGIC)){
 		kprint("BAD ELF MAGIC:");
-		pprint(hdr->magic);
+		hexprint(hdr->magic);
 		kprint("at:");
 		pprint(hdr);
 		return -1;
 	}
 
 	phdr = hdr->phoff + module;
-	while (phdr < (hdr->phentsize * hdr->phnum + module + hdr->phoff)){
-		memcpy(phdr->paddr, phdr->offset + module, phdr->filesize);
+	while ((void*)phdr < (hdr->phentsize * hdr->phnum + module + hdr->phoff)){
+		memcpy((void*)phdr->paddr, phdr->offset + module, phdr->filesize);
 		for (i = 0; i < phdr->memsize; i++)
-			ppage_reserve(phdr->paddr + i);
+			ppage_reserve((void*)phdr->paddr + i);
 
 	phdr = (void *)phdr + hdr->phentsize;
 	}

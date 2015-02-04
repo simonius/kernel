@@ -1,4 +1,5 @@
 #include <klib.h>
+#include <kernel.h>
 
 void *memcpy(void *dest, void *src, unsigned long n)
 {

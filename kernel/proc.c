@@ -43,7 +43,7 @@ void schedule()
 }
 
 
-int create_process(unsigned int entry)
+int create_process(void *entry)
 {
 	int i, j;
 	for (i = 0; i < TASK_LIMIT; i++)

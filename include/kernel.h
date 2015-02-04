@@ -13,5 +13,5 @@ void _reboot(void);
 void kprint(char *);
 void pprint(void *);
 void iprint(int);
-
+void hexprint(int);
 #endif

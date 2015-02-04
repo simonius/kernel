@@ -65,10 +65,10 @@ struct i386_state {
 	int error;
 
 	//saved by CPU
-	int eip;
+	void *eip;
 	int cs;
 	int eflags;
-	int esp;
+	void *esp;
 	int ss;
 };
 
@@ -82,6 +82,7 @@ void load_idt(struct table);
 void idt_init();
 struct i386_state *handle_interupt(struct i386_state *);
 void outb(short port, char wert);
+void state_print(struct i386_state *);
 
 ISR_H(0)
 ISR_H(1)

@@ -2,8 +2,8 @@
 #define MULTIBOOT_H
 
 struct mb_mod {		//structure of a multiboot module
-	unsigned int 	mod_start;
-	unsigned int 	mod_end;
+	void 		*mod_start;
+	void	 	*mod_end;
 	char		*mod_name;
 	unsigned int	reserved;
 };
