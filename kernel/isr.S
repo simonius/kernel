@@ -2,6 +2,8 @@
 #define ISR_ERROR(nr)	.global isr##nr ;isr##nr: pushl $##nr ; jmp master_isr
 
 .extern handle_interupt
+.global restart
+
 //exception
 ISR(0)
 ISR(1)
@@ -50,24 +52,28 @@ ISR(1864)
 master_isr:
 
 	pusha
-	
+
 	mov $0x10, %eax //load kernel data segments
 	mov %eax, %ds
 	mov %eax, %es
 
 
-	push %esp // put struct ptr on stack 
+	push %esp // put struct ptr on stack
 	call handle_interupt
-	mov %eax, %esp //copy ptr to i386_state in SP;
-		
+	// we will never return
+
+
+restart: /* restart(struct i386 *state) (return to userspace) */
+	mov 4(%esp), %eax
+	mov %eax, %esp
+
 	mov $0x23, %eax
 	mov %eax, %ds
-	mov %eax, %es	
+	mov %eax, %es
 
 	popa
 
 	add $8, %esp
-	
-	iret
 
+	iret
 

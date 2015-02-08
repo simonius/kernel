@@ -80,9 +80,12 @@ void load_seg_kernel(int ds, char ring);
 long long idt_entry(long offset, int cs, int flags);
 void load_idt(struct table);
 void idt_init();
-struct i386_state *handle_interupt(struct i386_state *);
+void handle_interupt(struct i386_state *);
 void outb(short port, char wert);
+char inb(short port);
+
 void state_print(struct i386_state *);
+void restart(struct i386_state *);
 
 ISR_H(0)
 ISR_H(1)

@@ -23,8 +23,8 @@ void init(struct multiboot *mbs)
 		
 
 	process_init(mbs);
-	asm volatile("sti");
-	curr_task->flags = PROCESS_VALID;
+
+	kprint("WE GOT TO THE END !");
 	while(1);
 }
 

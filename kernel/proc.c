@@ -28,18 +28,29 @@ void print_task(struct process *task)
 	return;
 }
 
+void add_runlist(struct process *proc)
+{
+	struct process **ptr = &runnable;
+	while (*ptr != NULL)
+		ptr = &((*ptr)->next);
+	*ptr = proc;
+	proc->next = NULL;
+}
+
 void schedule()
 {
-	if ((curr_task->flags & PROCESS_RUN) == 0){
-		curr_task = runnable ;
-		return;
- 	}
-
-	if (curr_task->next_runnable != NULL){
-		curr_task = curr_task->next_runnable;
-		return;
+	struct process *old, *new;
+	if (curr_task->ticks-- < 1){
+		curr_task->ticks = 3;
+		add_runlist(curr_task);	//rewrite scheduler
+		old = curr_task;
+		if (runnable == NULL)
+			panic("no runnable process");
+		curr_task = runnable;
+		new = curr_task;
+		if (new != old)
+			swtch(&(old->thread_state), new->thread_state);
 	}
-
 }
 
 
@@ -66,7 +77,8 @@ int create_process(void *entry)
 	tasks[i].cpu->cs = 0x18 | 0x03;
 	tasks[i].cpu->ss = 0x20 | 0x03;
 	tasks[i].cpu->eip = entry;
-	tasks[i].next_runnable = NULL;
+	tasks[i].next = NULL;
+	tasks[i].ticks = 10;
 	return i;
 }
 
@@ -91,4 +103,38 @@ void process_init(struct multiboot *mbs)
 		panic("Bad init Module");
 
 	runnable = &tasks[PID];
+	curr_task = runnable;
+	runnable = runnable->next;
+	proc_restart(curr_task);
+}
+
+void proc_unblock(struct process **waiting)
+{
+	struct process **ptr;
+	ptr = &runnable;
+	while (*ptr != NULL)
+		ptr = &((*ptr)->next);
+
+	*ptr = *waiting;
+	waiting = &((*waiting)->next);
+	(*ptr)->next = NULL;
+	(*ptr)->flags |= PROCESS_RUN;
+}
+
+void proc_block(struct process **waiting)
+{
+	struct process **ptr, *old, *new;
+	ptr = waiting;
+	while (*ptr != NULL)
+		ptr = &((*ptr)->next);
+
+	*ptr = curr_task;
+	(*ptr)->next = NULL;
+	curr_task->flags &= ~PROCESS_RUN;
+	if (runnable == NULL)
+		panic("no runnable process");
+	new = runnable;
+	old = curr_task;
+	curr_task = new;
+	swtch(&(old->thread_state), new->thread_state);
 }

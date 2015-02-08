@@ -9,11 +9,13 @@
 #include <multiboot.h>
 
 struct process {
+	int ticks;
 	int flags;
 	struct i386_state *cpu;
+	void *thread_state;
 	void *kernel_stack;
 	void *user_stack;
-	struct process *next_runnable;
+	struct process *next;
 };
 
 extern struct process *curr_task;
@@ -23,4 +25,6 @@ void schedule();
 int create_process(void *entry);
 void process_init(struct multiboot *mbs);
 
+void swtch(void **old, void *new);
+void proc_restart(struct process *task);
 #endif

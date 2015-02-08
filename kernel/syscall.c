@@ -2,6 +2,7 @@
 #include <i386.h>
 #include <vga.h>
 #include <kernel.h>
+#include <proc.h>
 
 void syscall(struct i386_state *cpu)
 {
@@ -18,4 +19,5 @@ void syscall(struct i386_state *cpu)
 		kprint("IMPLEMENT SYSCALL #");
 		iprint(cpu->INT);
 	}
+	proc_restart(curr_task);
 }

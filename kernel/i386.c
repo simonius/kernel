@@ -92,7 +92,7 @@ long long idt_entry(long offset, int cs, int flags)
 	return idt_entry;
 }
 
-struct i386_state *handle_interupt(struct i386_state *cpu)
+void handle_interupt(struct i386_state *cpu)
 {
 	curr_task->cpu = cpu;
 
@@ -107,7 +107,6 @@ struct i386_state *handle_interupt(struct i386_state *cpu)
 		while(1);
 	case 0x20:
 		schedule();
-		tss[1] = (unsigned int)(curr_task->cpu + 1);
 	break;
 	case 48:
 		kprint("SYSCALL !!!");
@@ -116,12 +115,17 @@ struct i386_state *handle_interupt(struct i386_state *cpu)
 	default:
 		state_print(curr_task->cpu);
 	}
-	
 
 	outb(0xa0, 0x20); // demask PIC
 	outb(0x20, 0x20);
-	return curr_task->cpu;
-		
+
+	proc_restart(curr_task);
+}
+
+void proc_restart(struct process *task)
+{
+	tss[1] = (unsigned int)task->kernel_stack;
+	restart(task->cpu);
 }
 
 void load_idt(struct table idt)
@@ -208,3 +212,9 @@ inline void outb(short port, char wert)
         asm volatile("outb %0, %1" :: "a"(wert), "d"(port));
 }
 
+inline char inb(short port)
+{
+	char ret;
+	asm volatile("inb %1, %0" : "=a"(ret): "d"(port));
+	return ret;
+}
