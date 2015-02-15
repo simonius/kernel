@@ -48,9 +48,18 @@ void schedule()
 			panic("no runnable process");
 		curr_task = runnable;
 		new = curr_task;
-		if (new != old)
-			swtch(&(old->thread_state), new->thread_state);
 	}
+
+	if (!(curr_task->flags & PROCESS_RUN)){
+		old = curr_task;
+		if (runnable == NULL)
+			panic("no runnable process");
+		curr_task = runnable;
+		new = curr_task;
+	}
+
+	if (new != old)
+		context_switch(old, new);
 }
 
 
@@ -91,21 +100,6 @@ void process_init(struct multiboot *mbs)
 	for (PID = 1; PID < TASK_LIMIT; PID++)
 		tasks[PID].flags = 0;
 
-	if (mbs->mbs_mods_count < 1)
-		panic("No Init Module");
-
-	iprint(mbs->mbs_mods_count);
-	kprint(" Multiboot Modules, using one as init: ");
-	kprint(mbs->mbs_mods_addr->mod_name);
-	kprint("\n");
-
-	if (load_elf_module(mbs->mbs_mods_addr->mod_start, &PID))
-		panic("Bad init Module");
-
-	runnable = &tasks[PID];
-	curr_task = runnable;
-	runnable = runnable->next;
-	proc_restart(curr_task);
 }
 
 void proc_unblock(struct process **waiting)
@@ -133,8 +127,19 @@ void proc_block(struct process **waiting)
 	curr_task->flags &= ~PROCESS_RUN;
 	if (runnable == NULL)
 		panic("no runnable process");
+
 	new = runnable;
 	old = curr_task;
 	curr_task = new;
-	swtch(&(old->thread_state), new->thread_state);
+	context_switch(old, new);
+}
+
+void context_switch(struct process *old, struct process *new)
+{
+	change_userptbl(old->pgtbl, new->pgtbl);
+	if (new->thread_state == NULL)
+		swtch_user(&(old->thread_state), new->cpu);
+	else
+		swtch(&(old->thread_state), new->thread_state);
+	return;
 }

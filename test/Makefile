@@ -17,7 +17,20 @@ mod.o: mod.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 
+fd.img: ../simux
+	dd if=/dev/zero of=fd.img bs=1k count=1440
+	mke2fs fd.img
+	mkdir mnt
+	sudo mount fd.img mnt
+	sudo chmod a+rwx mnt
+	mkdir mnt/boot
+	cp ../simux mnt/
+	extlinux --install mnt/boot
+	cp syslinux.cfg mnt/boot/
+	sudo umount mnt
+
 clean:
 	rm *.o
+	rm fd.img -rf mnt
 
 .PHONY: clean 

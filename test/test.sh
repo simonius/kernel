@@ -1,2 +1,6 @@
 #!/bin/sh
-qemu-system-i386  -kernel ../simux -d int,cpu_reset -no-reboot -m 64 -initrd mod.mod
+cd ../
+make clean
+make
+cd test
+qemu-system-x86_64  -kernel ../simux -d int,cpu_reset -no-reboot -m 64 -initrd mod.mod

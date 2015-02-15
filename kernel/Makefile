@@ -6,7 +6,7 @@ LD = ld.gold
 AS = as
 
 ASFLAGS = -m32 -c -target i586-pc-none-elf
-CFLAGS =  -c -m32 -O0 -ffreestanding -nostdinc -nostdlib -I../include -Wall -target i586-pc-none-elf
+CFLAGS =  -c -m32 -O0 -ffreestanding -nostdinc -nostdlib -I../include -Wall -target i586-pc-none-elf -g 
 
 LDFLAGS = -melf_i386 -Tkernel.ld
 

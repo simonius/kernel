@@ -17,7 +17,8 @@ void state_print(struct i386_state *ptr)
 	kprint("\nUSER SS:"); hexprint(ptr->ss);
 	kprint("\nUSER CS:"); hexprint(ptr->cs);
 	kprint("\nUSER EIP:"); pprint(ptr->eip);
-	kprint("\nUSER INT:"); iprint(ptr->INT);
+	kprint("\nUSER INT:"); hexprint(ptr->INT);
+	kprint("\nerror:"); hexprint(ptr->error);
 	kprint("\n");
 }
 
@@ -105,6 +106,11 @@ void handle_interupt(struct i386_state *cpu)
 		kprint("\n   GPF INT 13 !   ");
 		asm volatile ("cli; hlt");
 		while(1);
+	case 0x0e:
+		kprint("\n PAGEFAULT !!!");
+		state_print(cpu);
+		panic("no PF handler");
+		break;
 	case 0x20:
 		schedule();
 	break;
