@@ -14,7 +14,9 @@ extern struct proc *runnable;
 
 void init(struct multiboot *mbs)
 {
-	void *page;
+	int *ptrs[250];
+	int i;
+
 	kprint("\f");
 	kprint("Hello Hardware \n");
 
@@ -26,6 +28,10 @@ void init(struct multiboot *mbs)
 	idt_init();
 	kprint("done \n");
 
+	kprint("klib_init ...");
+	klib_init();
+	kprint("done");
+
 	kprint("PMM init ... ");
 	pmm_init(mbs);
 	kprint("done \n");
@@ -34,14 +40,18 @@ void init(struct multiboot *mbs)
 
 	process_init(mbs);
 
-	kprint("WE GOT TO THE END !, TESTS: \nFinding Free Virtual memory");
-	pprint(page = valloc_u());
-	kprint("\n");
-	pprint(valloc_u());
-	kprint("\n");
-	pprint(valloc_u());
 
-	*(int*)page = 0x1701;
+
+	kprint("testing klib");
+
+	for (i = 0; i < 100; i++)
+		ptrs[i] = kmalloc(4);
+
+	for (i = 0; i < 100; i++)
+		*(ptrs[i]) = 0x1864;
+
+	for (i = 0; i < 100; i++)
+		kfree(ptrs[i]);
 
 	if (runnable == NULL)
 		panic("NO INIT");
