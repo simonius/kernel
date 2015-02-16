@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2015 Simon Klein
+ *
+ */
+
+
 #define ISR(nr) 	.global isr##nr ; isr##nr: pushl $0 ; pushl $##nr ; jmp master_isr
 #define ISR_ERROR(nr)	.global isr##nr ;isr##nr: pushl $##nr ; jmp master_isr
 

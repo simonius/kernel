@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2015 Simon Klein
+ *
+ */
+
 /* proc.c - scheduling and other process managment*/
 
 #include <proc.h>

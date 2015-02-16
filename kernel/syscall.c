@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2015 Simon Klein
+ *
+ */
+
 #include <syscall.h>
 #include <i386.h>
 #include <vga.h>

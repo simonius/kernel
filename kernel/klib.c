@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2015 Simon Klein
+ *
+ */
+
 #include <klib.h>
 #include <kernel.h>
 

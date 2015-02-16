@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2015 Simon Klein
+ *
+ */
+
 #include <mm.h>
 #include <kernel.h>
 #include <multiboot.h>

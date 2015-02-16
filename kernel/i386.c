@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2015 Simon Klein
+ *
+ */
+
 #include <i386.h>
 #include <kernel.h>
 #include <proc.h>

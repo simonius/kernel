@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2015 Simon Klein
+ *
+ */
+
 #include <elf.h>
 #include <proc.h>
 #include <klib.h>

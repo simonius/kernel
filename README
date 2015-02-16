@@ -1,0 +1,14 @@
+This is the README for the Simux Operating System/Kernel
+
+WHAT IS SIMUX ?
+
+ It is a small Unix clone, written mostly from scratch.
+
+HOW COMPLETE IS IT ?
+
+ It is 10% complete. I want to add more parts, but my time is limited.
+
+HOW CAN I BUILD IT ?
+
+ You will need clang/llvm and make, on an unix-like operating system.
+ Type "make" in the top directory.

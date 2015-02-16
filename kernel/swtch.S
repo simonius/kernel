@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2015 Simon Klein
+ *
+ */
+
+
 /* function that saves the state of one thread and restarts another 	*
  * swtch(void **old_sp, void *new_sp) 					*/
 

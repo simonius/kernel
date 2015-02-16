@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2015 Simon Klein
+ *
+ */
+
 #define MB_MAGIC 0x1badb002
 #define MB_FLAGS 0x2 //get mem info
 #define MB_CHECKSUM - (MB_MAGIC + MB_FLAGS)
