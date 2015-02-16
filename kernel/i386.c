@@ -47,11 +47,11 @@ void load_seg_kernel(int ds, char ring)
 
 void load_gdt(struct table gdt)
 {
-	short gdt_arr[3];
+	unsigned short gdt_arr[3];
 	gdt_arr[0] = (gdt.limit * 8) - 1;
-	gdt_arr[1] = (int)gdt.entries & 0xffff;
-	gdt_arr[2] = (int)gdt.entries >> 16;
-	asm volatile("lgdtw %0":: "m" (gdt_arr[0])); /* not *exactly* correct*/
+	gdt_arr[1] = (unsigned int)gdt.entries & 0xffff;
+	gdt_arr[2] = (unsigned int)gdt.entries >> 16;
+	asm volatile("lgdtl %0":: "m" (gdt_arr[0])); /* not *exactly* correct*/
 }
 
 long long gdt_entry(long base, long limit, char acces, char flags)
@@ -141,12 +141,12 @@ void proc_restart(struct process *task)
 
 void load_idt(struct table idt)
 {
-	short idt_arr[3];
+	unsigned short idt_arr[3];
 	idt_arr[0] = (idt.limit * 8) - 1;
-	idt_arr[1] = (int)idt.entries & 0xffff;
-	idt_arr[2] = (int)idt.entries >> 16;
+	idt_arr[1] = (unsigned int)idt.entries & 0xffff;
+	idt_arr[2] = (unsigned int)idt.entries >> 16;
 
-	asm volatile("lidtw %0" :: "m" (idt_arr[0]));
+	asm volatile("lidtl %0" :: "m" (idt_arr[0]));
 }
 
 void idt_init()
