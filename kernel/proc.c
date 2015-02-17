@@ -42,27 +42,36 @@ void add_runlist(struct process *proc)
 	proc->next = NULL;
 }
 
+void pick_new_current()
+{
+	if (curr_task != NULL)
+		add_runlist(curr_task);
+
+	if (runnable != NULL)
+		curr_task = runnable;
+	else
+		curr_task = &tasks[0];
+}
+
 void schedule()
 {
 	struct process *old, *new;
+
+	old = curr_task;
+
+	if (curr_task == NULL)
+		pick_new_current();
+
 	if (curr_task->ticks-- < 1){
 		curr_task->ticks = 3;
-		add_runlist(curr_task);	//rewrite scheduler
-		old = curr_task;
-		if (runnable == NULL)
-			panic("no runnable process");
-		curr_task = runnable;
-		new = curr_task;
+		pick_new_current();
 	}
 
 	if (!(curr_task->flags & PROCESS_RUN)){
-		old = curr_task;
-		if (runnable == NULL)
-			panic("no runnable process");
-		curr_task = runnable;
-		new = curr_task;
+		pick_new_current();
 	}
 
+	new = curr_task;
 	if (new != old)
 		context_switch(old, new);
 }
@@ -93,6 +102,7 @@ int create_process(void *entry)
 	tasks[i].cpu->eip = entry;
 	tasks[i].next = NULL;
 	tasks[i].ticks = 10;
+	tasks[i].thread_state = NULL;
 	return i;
 }
 
@@ -100,11 +110,14 @@ void process_init(struct multiboot *mbs)
 {
 	int PID;
 	tasks[0].flags = PROCESS_VALID;
-	curr_task = &tasks[0];
+	tasks[0].flags = PROCESS_RUN;
+	tasks[0].thread_state = NULL;
+	tasks[0].cpu = NULL;
 
 	for (PID = 1; PID < TASK_LIMIT; PID++)
 		tasks[PID].flags = 0;
 
+	curr_task = &tasks[0];
 }
 
 void proc_unblock(struct process **waiting)
@@ -141,6 +154,9 @@ void proc_block(struct process **waiting)
 
 void context_switch(struct process *old, struct process *new)
 {
+	if (new->thread_state == NULL && new->cpu == NULL)
+		panic("unrunnable process should be running");
+
 	change_userptbl(old->pgtbl, new->pgtbl);
 	if (new->thread_state == NULL)
 		swtch_user(&(old->thread_state), new->cpu);

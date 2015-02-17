@@ -12,9 +12,10 @@
 
 extern struct proc *runnable;
 
+unsigned long long ticks = 0;
+
 void init(struct multiboot *mbs)
 {
-	int *ptrs[250];
 	int i;
 
 	kprint("\f");
@@ -30,7 +31,7 @@ void init(struct multiboot *mbs)
 
 	kprint("klib_init ...");
 	klib_init();
-	kprint("done");
+	kprint("done \n");
 
 	kprint("PMM init ... ");
 	pmm_init(mbs);
@@ -40,22 +41,12 @@ void init(struct multiboot *mbs)
 
 	process_init(mbs);
 
-
-
-	kprint("testing klib");
-
-	for (i = 0; i < 100; i++)
-		ptrs[i] = kmalloc(4);
-
-	for (i = 0; i < 100; i++)
-		*(ptrs[i]) = 0x1864;
-
-	for (i = 0; i < 100; i++)
-		kfree(ptrs[i]);
-
-	if (runnable == NULL)
-		panic("NO INIT");
-	while(1);
+	while(1) {
+		for (i = 0; i < 100; i++)
+			idle();
+		kprint("idled for 100 ticks, ");
+		iprint(ticks); kprint(" ticks since boot \n");
+	}
 }
 
 

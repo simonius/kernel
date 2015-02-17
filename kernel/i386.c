@@ -41,8 +41,6 @@ void load_seg_kernel(int ds, char ring)
 	asm volatile( 	"ljmp $0x08, $1f  \n\t" /*numeric label forward, f suffix*/
 			"1: \n\t");
 	return;
-	
-
 }
 
 void load_gdt(struct table gdt)
@@ -94,7 +92,7 @@ long long idt_entry(long offset, int cs, int flags)
 	idt_entry |= (cs & 0xffff) << 16;
 	idt_entry |= (long long)(flags & 0xffff) << 32;
 	idt_entry |= (long long)(offset & 0xffff0000) << 32;
-	
+
 	return idt_entry;
 }
 
@@ -117,6 +115,7 @@ void handle_interupt(struct i386_state *cpu)
 		panic("no PF handler");
 		break;
 	case 0x20:
+		ticks++;
 		schedule();
 	break;
 	case 48:
@@ -228,4 +227,11 @@ inline char inb(short port)
 	char ret;
 	asm volatile("inb %1, %0" : "=a"(ret): "d"(port));
 	return ret;
+}
+
+void idle()
+{
+	asm volatile (	"sti \n\t"
+			"hlt \n\t"
+			"cli \n\t" );
 }

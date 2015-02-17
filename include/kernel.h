@@ -4,6 +4,7 @@
 #define NULL	(void*)0
 
 
+extern unsigned long long ticks;
 
 extern void _kernel_begin;
 extern void _kernel_end;

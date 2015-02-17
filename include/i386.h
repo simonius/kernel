@@ -86,6 +86,7 @@ char inb(short port);
 
 void state_print(struct i386_state *);
 void restart(struct i386_state *);
+void idle();
 
 ISR_H(0)
 ISR_H(1)
