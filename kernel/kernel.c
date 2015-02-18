@@ -10,6 +10,9 @@
 #include <mm.h>
 #include <multiboot.h>
 
+#include <ringbuf.h>
+#include <vga.h>
+
 extern struct proc *runnable;
 
 unsigned long long ticks = 0;
@@ -17,6 +20,11 @@ unsigned long long ticks = 0;
 void init(struct multiboot *mbs)
 {
 	int i;
+
+	struct ringbuf buf;
+	char data[100];
+	char *test = {"Hello from ringbuf \n"};
+	char a;
 
 	kprint("\f");
 	kprint("Hello Hardware \n");
@@ -40,6 +48,18 @@ void init(struct multiboot *mbs)
 	vmm_init();
 
 	process_init(mbs);
+
+
+	ring_init(&buf, sizeof(data), data);
+	for (i = 0; test[i] != '\0'; i++)
+		ring_write(&buf, &test[i]);
+
+	while(ring_ne(&buf)) {
+		ring_read(&buf, &a);
+		putchar(a, VGA_BLUE);
+	}
+
+
 
 	while(1) {
 		for (i = 0; i < 100; i++)

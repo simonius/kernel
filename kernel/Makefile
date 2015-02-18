@@ -1,4 +1,5 @@
-OBJ = kernel.o start.o vga.o kprint.o klib.o i386.o isr.o proc.o mm.o elf.o syscall.o swtch.o
+OBJ = kernel.o start.o vga.o kprint.o klib.o i386.o isr.o proc.o mm.o elf.o syscall.o swtch.o \
+ringbuf.o 
 
 
 CC = clang

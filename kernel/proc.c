@@ -122,6 +122,9 @@ void process_init(struct multiboot *mbs)
 
 void proc_unblock(struct process **waiting)
 {
+	if (waiting == NULL || *waiting == NULL)
+		return;
+
 	struct process **ptr;
 	ptr = &runnable;
 	while (*ptr != NULL)
@@ -135,6 +138,9 @@ void proc_unblock(struct process **waiting)
 
 void proc_block(struct process **waiting)
 {
+	if (waiting == NULL || *waiting == NULL)
+		return;
+
 	struct process **ptr, *old, *new;
 	ptr = waiting;
 	while (*ptr != NULL)

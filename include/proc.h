@@ -32,4 +32,8 @@ void swtch(void **old, void *new);
 void swtch_user(void **old_sp, struct i386_state *user);
 void proc_restart(struct process *task);
 void context_switch(struct process *old, struct process *new);
+
+void proc_block(struct process **);
+void proc_unblock(struct process **);
+
 #endif
