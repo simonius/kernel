@@ -15,16 +15,14 @@
 
 extern struct proc *runnable;
 
-unsigned long long ticks = 0;
+void myisr(struct i386_state* cpu)
+{
+	kprint("test isr fired");
+}
 
 void init(struct multiboot *mbs)
 {
 	int i;
-
-	struct ringbuf buf;
-	char data[100];
-	char *test = {"Hello from ringbuf \n"};
-	char a;
 
 	kprint("\f");
 	kprint("Hello Hardware \n");
@@ -49,16 +47,8 @@ void init(struct multiboot *mbs)
 
 	process_init(mbs);
 
-
-	ring_init(&buf, sizeof(data), data);
-	for (i = 0; test[i] != '\0'; i++)
-		ring_write(&buf, &test[i]);
-
-	while(ring_ne(&buf)) {
-		ring_read(&buf, &a);
-		putchar(a, VGA_BLUE);
-	}
-
+	register_isr(1, myisr);
+	asm volatile("int $0x21 \n\t");
 
 
 	while(1) {

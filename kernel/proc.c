@@ -16,7 +16,7 @@
 struct process *curr_task = NULL;
 struct process *runnable = NULL;
 struct process tasks[TASK_LIMIT];
-
+unsigned long long ticks;
 
 
 

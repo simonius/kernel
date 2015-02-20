@@ -13,7 +13,9 @@ long long gdt_table[GDT_LIMIT];
 long long idt_table[IDT_LIMIT];
 unsigned int tss[32];
 
-struct table gdt, idt ;
+struct table gdt, idt;
+
+void (*isrs[16])(struct i386_state *cpu);
 
 void state_print(struct i386_state *ptr)
 {
@@ -27,6 +29,18 @@ void state_print(struct i386_state *ptr)
 	kprint("\n");
 }
 
+int register_isr(int intr, void (*isr))
+{
+	if (intr > 16 && isrs[intr] == NULL)
+		return -1;
+	isrs[intr] = isr;
+	return 0;
+}
+
+void free_isr(int intr)
+{
+	isrs[intr] = NULL;
+}
 
 void load_seg_kernel(int ds, char ring)
 {
@@ -123,7 +137,10 @@ void handle_interupt(struct i386_state *cpu)
 		syscall(cpu);
 		break;
 	default:
-		state_print(curr_task->cpu);
+		if (cpu->INT >= 0x20 && cpu->INT < 0x30 && isrs[cpu->INT - 0x20] != NULL)
+			isrs[cpu->INT - 0x20](cpu);
+		else
+			state_print(curr_task->cpu);
 	}
 
 	outb(0xa0, 0x20); // demask PIC
@@ -213,7 +230,10 @@ void idt_init()
 
 	idt.limit = IDT_LIMIT;
 	idt.entries = (void *)idt_table;
-		
+
+	for(i = 0; i < 16; i++)
+		isrs[i] = NULL;
+
 	load_idt(idt);
 }
 
