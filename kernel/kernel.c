@@ -12,6 +12,7 @@
 
 #include <ringbuf.h>
 #include <vga.h>
+#include <uart.h>
 
 extern struct proc *runnable;
 
@@ -23,6 +24,7 @@ void myisr(struct i386_state* cpu)
 void init(struct multiboot *mbs)
 {
 	int i;
+	char a;
 
 	kprint("\f");
 	kprint("Hello Hardware \n");
@@ -49,6 +51,14 @@ void init(struct multiboot *mbs)
 
 	register_isr(1, myisr);
 	asm volatile("int $0x21 \n\t");
+
+
+	uart_init(12);
+	uart_open();
+
+	while(1)
+		if (uart_rx(&a) == 1)
+			putchar(a, VGA_BLUE);
 
 
 	while(1) {

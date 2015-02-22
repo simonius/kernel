@@ -5,6 +5,7 @@
 
 #include "kernel.h"
 #include "vga.h"
+#include "uart.h"
 
 void puthexdig(int hex);
 
@@ -14,14 +15,17 @@ void puthexdig(int hex)
 	if(hex > 15)
 		return ;
 	putchar(hexletters[hex], VGA_GREEN);
+	uart_tx(hexletters[hex]);
 	return;
 }
 
 void kprint(char* string)
 {
 	int i;
-	for(i = 0; *(string + i) != '\0'; i++)
+	for(i = 0; *(string + i) != '\0'; i++) {
 		putchar(*(string + i), VGA_GREY);
+		uart_tx(*(string + i));
+	}
 	return;
 }
 
