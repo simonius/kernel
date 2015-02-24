@@ -13,18 +13,14 @@
 #include <ringbuf.h>
 #include <vga.h>
 #include <uart.h>
+#include <ata.h>
 
 extern struct proc *runnable;
-
-void myisr(struct i386_state* cpu)
-{
-	kprint("test isr fired");
-}
 
 void init(struct multiboot *mbs)
 {
 	int i;
-	char a;
+	char sector[512] = {"Hello block\n"};
 
 	kprint("\f");
 	kprint("Hello Hardware \n");
@@ -47,19 +43,16 @@ void init(struct multiboot *mbs)
 
 	vmm_init();
 
-	process_init(mbs);
-
-	register_isr(1, myisr);
-	asm volatile("int $0x21 \n\t");
-
-
 	uart_init(12);
 	uart_open();
+	ata_init();
 
-	while(1)
-		if (uart_rx(&a) == 1)
-			putchar(a, VGA_BLUE);
+	process_init(mbs);
 
+	iprint(write_sector(0, sector));
+	iprint(read_sector(1, sector));
+
+	kprint(sector);
 
 	while(1) {
 		for (i = 0; i < 100; i++)
